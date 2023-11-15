@@ -1,6 +1,6 @@
 const Task = require("../models/task.model");
 
-const paginationHelper  = require("../../../helpers/pagination");
+const paginationHelper = require("../../../helpers/pagination");
 const SearchHelper = require("../../../helpers/search");
 
 // [GET] /api/v1/tasks
@@ -15,10 +15,10 @@ module.exports.index = async (req, res) => {
   //Hết bộ lọc
 
   //Search
-   const objectSearch = SearchHelper(req.query);
-   if (objectSearch.regex) {
-     find.title = objectSearch.regex;
-   }
+  const objectSearch = SearchHelper(req.query);
+  if (objectSearch.regex) {
+    find.title = objectSearch.regex;
+  }
   // End Search
 
   // Pagination
@@ -48,10 +48,51 @@ module.exports.index = async (req, res) => {
 
 // [GET] /api/v1/tasks/detail/:id
 module.exports.detail = async (req, res) => {
-  const id = req.params.id;
-  const tasks = await Task.findOne({
-    _id: id,
-    deleted: false,
-  });
-  res.json(tasks);
+  try {
+    const id = req.params.id;
+    const tasks = await Task.findOne({
+      _id: id,
+      deleted: false,
+    });
+    res.json(tasks);
+  } catch (error) {
+    res.json({
+      code: 400,
+      message: "Cập nhật trạng thái không thành công",
+    });
+  }
+};
+
+// [PATCH] /api/v1/tasks/change-status/:id
+module.exports.changeStatus = async (req, res) => {
+  try {
+   const listStatus = ["initial", "doing", "notFinish", "finish"];
+    const id = req.params.id;
+    const status = req.body.status;
+   if(listStatus.includes(status)){
+       await Task.updateOne(
+         {
+           _id: id,
+         },
+         {
+           status: status,
+         }
+       );
+       res.json({
+         code: 200,
+         message: "Cập nhật trạng thái thành công",
+       });
+   }else{
+      res.json({
+        code: 400,
+        message: "Cập nhật trạng thái không thành công",
+        error : "status not format"
+      });
+   }
+  } catch (error) {
+    res.json({
+      code: 400,
+      message: "Cập nhật trạng thái không thành công",
+    });
+  }
 };
