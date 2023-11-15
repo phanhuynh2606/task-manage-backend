@@ -66,29 +66,58 @@ module.exports.detail = async (req, res) => {
 // [PATCH] /api/v1/tasks/change-status/:id
 module.exports.changeStatus = async (req, res) => {
   try {
-   const listStatus = ["initial", "doing", "notFinish", "finish"];
+    const listStatus = ["initial", "doing", "notFinish", "finish"];
     const id = req.params.id;
     const status = req.body.status;
-   if(listStatus.includes(status)){
-       await Task.updateOne(
-         {
-           _id: id,
-         },
-         {
-           status: status,
-         }
-       );
-       res.json({
-         code: 200,
-         message: "Cập nhật trạng thái thành công",
-       });
-   }else{
+    if (listStatus.includes(status)) {
+      await Task.updateOne(
+        {
+          _id: id,
+        },
+        {
+          status: status,
+        }
+      );
+      res.json({
+        code: 200,
+        message: "Cập nhật trạng thái thành công",
+      });
+    } else {
       res.json({
         code: 400,
         message: "Cập nhật trạng thái không thành công",
-        error : "status not format"
+        error: "status not format",
       });
-   }
+    }
+  } catch (error) {
+    res.json({
+      code: 400,
+      message: "Cập nhật trạng thái không thành công",
+    });
+  }
+};
+
+// [PATCH] /api/v1/tasks/change-multi
+module.exports.changeMulti = async (req, res) => {
+  try {
+    const { ids, key, value } = req.body;
+
+    switch (key) {
+      case "status":
+        await Task.updateMany({ _id: { $in: ids }}, { status: value });
+        res.json({
+          code: 200,
+          message: "Cập nhật trạng thái thành công",
+        });
+        break;
+
+      default:
+        res.json({
+          code: 400,
+          message: "Cập nhật trạng thái không thành công",
+        });
+        break;
+    }
   } catch (error) {
     res.json({
       code: 400,
