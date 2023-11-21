@@ -9,6 +9,7 @@ const taskSchema = new mongoose.Schema(
     timeFinish: Date,
     createBy : String,
     listUsers : Array,
+    //supervisor : Array
     deleted: {
       type: Boolean,
       default: false,
