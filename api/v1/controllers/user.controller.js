@@ -164,16 +164,10 @@ module.exports.resetPassword = async (req, res) => {
 
 // [GET] /api/v1/users/detail/:id
 module.exports.detail = async (req, res) => {
-  const id = req.params.id;
-  console.log(id);
 
-  const user = await User.findOne({
-    _id:id,
-    deleted:false
-  }).select("-password");
   res.json({
-    code:200,
-    message:"Detail profile",
-    "info" : user
-  })
+    code: 200,
+    message: "Detail profile",
+    info: req.user,
+  });
 }
